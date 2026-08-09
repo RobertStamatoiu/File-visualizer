@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom IDE</title>
+    <title>Vega IDE</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,11 +11,26 @@
 <body>
     
     <div class="layout">
-        <div id="tree-view" class="block">Tree Visualizer</div>
-        <div id="vertical-separator"></div>
-        <div id="terminal-view" class="block">Terminal Visualizer</div>
+        <div id="tree" class="block">
+
+        </div>
+        <div id="terminal" class="block">
+            <div class="terminal-overlay"></div>
+            <div id="terminal-bar">
+
+            </div>
+            <div id="terminal-input">
+                <span id="prompt"></span>
+                <span id="command"></span>
+                <span id="cursor"></span>
+            </div>
+        </div>
+        <div id="file" class="block">
+
+        </div>
+
         <div id="horizontal-separator"></div>
-        <div id="file-view" class="block">File Visualizer</div>
+        <div id="vertical-separator"></div>
     </div>
 
     <script src="script.js"></script>

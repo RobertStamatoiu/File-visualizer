@@ -30,32 +30,92 @@ body {
 .block {
     border: 2px solid black;
     user-select: none;
+    background-color: #021a33;
 }
 
-#tree-view {
+#terminal {
+    position: relative;
+    overflow: hidden;
+
+    grid-column: 3;
+    grid-row: 3 / 4;
+
+    background: #000;
+    color: #ffffff;
+
+    font-family: monospace;
+    padding: 10px;
+
+    overflow-y: auto;
+}
+
+.terminal-overlay {
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background-image: url("images/void.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.25;
+
+    z-index: 0;
+}
+
+#tree {
     grid-column: 1;
     grid-row: 1 / 4;
 }
 
-#terminal-view {
-    grid-column: 3;
-    grid-row: 3 / 4;
+#terminal-input {
+    display: flex;
 }
 
-#file-view {
+#prompt {
+    margin-right: 8px;
+}
+
+#cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: currentColor;
+    vertical-align: text-bottom;
+
+    animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+#file {
     grid-column: 3;
     grid-row: 1;
 }
 
 #vertical-separator {
     grid-row: 1 / 4;
-    background-color: blueviolet;
     cursor: col-resize;
+    background: transparent;
+    border: 2px solid #444;
 }
 
 #horizontal-separator {
     grid-row: 2;
     grid-column: 3;
-    background-color: blueviolet;
     cursor: row-resize;
+    background: transparent;
+    border: 2px solid #444;
 }
+
+/* here we add colors for the text to be used later */
+
+.command     { color: #FF1744; font-weight: bold; }
+.fluorescent { color: #CCFF00; }
+.info        { color: #5FDDEF; }
+.success     { color: #0DDF0A; }
