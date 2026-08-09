@@ -18,8 +18,8 @@ body {
 .layout {
     display: grid;
 
-    grid-template-columns: repeat(6, 1fr 5px) 1fr;
-    grid-template-rows: 1fr 5px 1fr 5px 1fr;
+    grid-template-columns: 700px 3px 1fr;
+    grid-template-rows: 1fr 3px 300px;
 
     width: 100vw;
     height: 100vh;
@@ -27,32 +27,35 @@ body {
     position: relative;
 }
 
-#tree-view {
-    border: none;
-    grid-column: 1 / 8;
-    grid-row: 1 / 6;
+.block {
+    border: 2px solid black;
+    user-select: none;
 }
 
-#vertical-separator {
-    border: none;
-    grid-column: 8 / 9;
-    grid-row: 1 / 6;
+#tree-view {
+    grid-column: 1;
+    grid-row: 1 / 4;
 }
 
 #terminal-view {
-    border: none;
-    grid-column: 9 / 14;
-    grid-row: 5 / 6;
-}
-
-#horizontal-separator {
-    border: qpx solid black;
-    grid-column: 9 / 14;
-    grid-row: 4 / 5;
+    grid-column: 3;
+    grid-row: 3 / 4;
 }
 
 #file-view {
-    border: none;
-    grid-column: 9 / 14;
+    grid-column: 3;
+    grid-row: 1;
+}
+
+#vertical-separator {
     grid-row: 1 / 4;
+    background-color: blueviolet;
+    cursor: col-resize;
+}
+
+#horizontal-separator {
+    grid-row: 2;
+    grid-column: 3;
+    background-color: blueviolet;
+    cursor: row-resize;
 }
