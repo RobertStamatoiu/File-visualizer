@@ -1,4 +1,18 @@
+function success(code, message){
+    return {
+        success: true,
+        returnCode: code,
+        message: message
+    };
+}
 
+function fail(code, message){
+    return {
+        success: false,
+        returnCode: code,
+        message: message
+    };
+}
 
 // File is an abstract class, a base for all other files. do NOT create an instance of this on its own
 
@@ -7,12 +21,57 @@ class File {
         this.parent = parent;
         this.name = name;
         if(parent != null){
-            parent.childs.push(this);
+            parent.children.push(this);
         }
     }
+    descendantOf(file){
+        let current;
+        while(current !== null){
+            if(current === file){
+                return true;
+            }
+            current = current.parent;
+        }
+        return false;
+    }
     move(newParent){
-        this.parent.childs.splice(this.parent.childs.indexOf(this), 1);
+        if(!(newParent instanceof Direectory)){
+            return fail(
+                "MOVE_TO_NON_DIRECTORY",
+                `Cannot move ${this.name} to ${newParent.name} because ${newParent.name} is not a directory`
+            );
+        } else if (newParent === this){
+            return fail(
+                "MOVE_TO_SELF",
+                `Cannot move ${this.name} to itself`
+            );
+        } else if (newParent.name === "DELETED"){
+            return fail(
+                "MOVE_TO_DEL",
+                `Cannot move ${this.name} because destination has been deleted`
+            );
+        } else if (newParent === this.parent){
+            return fail(
+                "MOVE_TO_PARENT",
+                `Cannot move ${this.name} to ${newParent.name} because ${this.name} is already inside ${newParent.name}`
+            );
+        } else if (this.name === "root"){
+            return fail(
+                "MOVE_ROOT",
+                `Cannot move the root`
+            );
+        } else if (newParent.descendantOf(this)){
+            return fail(
+                "MOVE_TO_CHILD",
+                `Cannot move ${this.name} to ${newParent.name} because ${newParent.name} is a descendant ot ${this.name}`
+            );
+        }
+        this.parent.children.splice(this.parent.children.indexOf(this), 1);
         newParent.add(this);
+        return success(
+            "MOVE_SUCCESS",
+            `Successfully moved ${this.name} to ${newParent.name}`
+        );
     }
     rename(newName){
         this.name = newName;
@@ -20,27 +79,29 @@ class File {
     destroy(){
         let index;
         if(this.parent != null){
-            index = this.parent.childs.indexOf(this);
+            index = this.parent.children.indexOf(this);
         }
         if(index != -1){
-            this.parent.childs.splice(index, 1);
+            this.parent.children.splice(index, 1);
         }
         this.name = "DELETED";
         this.parent = null;
     }
 }
 
+
 export class Directory extends File {
     constructor(parent = null, name){
         super(parent, name);
-        this.childs = [];
+        this.children = [];
     }
     add(file){
         if (file instanceof File){
-            this.childs.push(file);
+            this.children.push(file);
             file.parent = this;
         } else if (Array.isArray(file)){
-            this.childs.push(...file);
+            file = [...new Set(file)]
+            this.children.push(...file);
             for(const f of file){
                 f.parent = this;
             }
@@ -58,7 +119,7 @@ export class Directory extends File {
         }
     }
     forceDestroy(){
-        for(const file of this.childs){
+        for(const file of this.children){
             file.destroy();
         }
         super.destroy();
@@ -67,7 +128,7 @@ export class Directory extends File {
         if (this.parent === null && this.name === "root"){
             this.forceDestroy();
         } else {
-            this.parent.add(this.childs);
+            this.parent.add(this.children);
             super.destroy();
         }
     }
