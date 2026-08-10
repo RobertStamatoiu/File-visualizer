@@ -1,3 +1,5 @@
+import * as fs from "./filesystem.js"
+
 
 // HTML elements go below
 
@@ -33,28 +35,28 @@ let focused = Panel.TERMINAL;
 let command = "";
 let current_dir = "";
 
-function tokenise(input){
+function tokenise(input) {
     let tokens = [];
     let words = input.trim().split(/\s+/);
     for (let word of words) {
-        if(word[0] === "@"){
+        if (word[0] === "@") {
             tokens.push({
                 type: tokenType.command,
                 value: word.slice(1)
             });
-        } else if (word.includes("/")){
+        } else if (word.includes("/")) {
             tokens.push({
                 type: tokenType.filepath,
                 value: word
             });
-        } else if (word.startsWith("--")){
+        } else if (word.startsWith("--")) {
             tokens.push({
                 type: tokenType.verbflag,
                 value: word.slice(2)
             });
-        } else if (word.startsWith("-")){
+        } else if (word.startsWith("-")) {
             tokens.push({
-                type:tokenType.flag,
+                type: tokenType.flag,
                 value: word.slice(1)
             });
         } else {
@@ -66,10 +68,10 @@ function tokenise(input){
     }
     return tokens;
 }
-function renderToken(token){
+function renderToken(token) {
     const span = document.createElement("span");
     switch (token.type) {
-        case tokenType.command: 
+        case tokenType.command:
             span.className = "command";
             span.textContent = "@" + token.value;
             break;
@@ -103,10 +105,10 @@ ColSeparator.addEventListener('mousedown', () => { col_dragging = true; });
 document.addEventListener('mouseup', () => { row_dragging = false; col_dragging = false; });
 
 document.addEventListener('mousemove', (event) => {
-    if(!(row_dragging || col_dragging)){
+    if (!(row_dragging || col_dragging)) {
         return;
     }
-    if(col_dragging){
+    if (col_dragging) {
         const x = event.clientX;
         layout.style.gridTemplateColumns = `${Math.max(min_width, Math.min(x, window.innerWidth - min_width))}px 5px 1fr`;
     } else {
@@ -118,17 +120,18 @@ document.addEventListener('keydown', (event) => {
     let key = event.key;
     if (key.length === 1) {
         command += key;
-        if(focused === Panel.TERMINAL && key === "/"){
+        if (focused === Panel.TERMINAL && key === "/") {
             event.preventDefault();
         }
-    } else if (key === "Backspace"){
+    } else if (key === "Backspace") {
         command = command.slice(0, -1);
     } else {
         return;
     }
     commandElement.replaceChildren();
     let tokens = tokenise(command);
-    for(const token of tokens){
+    for (const token of tokens) {
         commandElement.appendChild(renderToken(token));
     }
 })
+
