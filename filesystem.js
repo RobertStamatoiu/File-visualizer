@@ -35,7 +35,7 @@ class File {
         return false;
     }
     move(newParent){
-        if(!(newParent instanceof Direectory)){
+        if(!(newParent instanceof Directory)){
             return fail(
                 "MOVE_TO_NON_DIRECTORY",
                 `Cannot move ${this.name} to ${newParent.name} because ${newParent.name} is not a directory`
@@ -45,7 +45,7 @@ class File {
                 "MOVE_TO_SELF",
                 `Cannot move ${this.name} to itself`
             );
-        } else if (newParent.name === "DELETED"){
+        } else if (newParent.parent === null && newParent !== root){
             return fail(
                 "MOVE_TO_DEL",
                 `Cannot move ${this.name} because destination has been deleted`
