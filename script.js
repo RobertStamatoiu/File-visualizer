@@ -1,14 +1,29 @@
 
+// HTML elements go below
+
 const layout = document.querySelector('.layout');
 const RowSeparator = document.getElementById("horizontal-separator");
 const ColSeparator = document.getElementById("vertical-separator");
+const terminal = document.getElementById("terminal");
+const commandElement = document.getElementById("command");
 
+// the panel type (later used for focusing / colapsing)
 
 const Panel = Object.freeze({
     FILE: "file",
     TERMINAL: "terminal",
     TREE: "tree"
 });
+
+const tokenType = Object.freeze({
+    command: 1,
+    filepath: 2,
+    argument: 3,
+    verbflag: 4,
+    flag: 5
+});
+
+// various variables used thourghout
 
 let row_dragging = false;
 let col_dragging = false;
@@ -17,6 +32,71 @@ let min_width = 230;
 let focused = Panel.TERMINAL;
 let command = "";
 let current_dir = "";
+
+function tokenise(input){
+    let tokens = [];
+    let words = input.trim().split(/\s+/);
+    for (let word of words) {
+        if(word[0] === "@"){
+            tokens.push({
+                type: tokenType.command,
+                value: word.slice(1)
+            });
+        } else if (word.includes("/")){
+            tokens.push({
+                type: tokenType.filepath,
+                value: word
+            });
+        } else if (word.startsWith("--")){
+            tokens.push({
+                type: tokenType.verbflag,
+                value: word.slice(2)
+            });
+        } else if (word.startsWith("-")){
+            tokens.push({
+                type:tokenType.flag,
+                value: word.slice(1)
+            });
+        } else {
+            tokens.push({
+                type: tokenType.argument,
+                value: word
+            });
+        }
+    }
+    return tokens;
+}
+function renderToken(token){
+    const span = document.createElement("span");
+    switch (token.type) {
+        case tokenType.command: 
+            span.className = "command";
+            span.textContent = "@" + token.value;
+            break;
+        case tokenType.filepath:
+            span.className = "filepath";
+            span.textContent = token.value;
+            break;
+        case tokenType.argument:
+            span.className = "";
+            span.textContent = token.value;
+            break;
+        case tokenType.verbflag:
+            span.className = "flag";
+            span.textContent = "--" + token.value;
+            break;
+        case tokenType.flag:
+            span.className = "flag";
+            span.textContent = "-" + token.value;
+            break;
+        default:
+            span.className = "";
+            span.textContent = token.value;
+            break;
+    }
+    span.textContent += " ";
+    return span;
+}
 
 RowSeparator.addEventListener('mousedown', () => { row_dragging = true; });
 ColSeparator.addEventListener('mousedown', () => { col_dragging = true; });
@@ -34,13 +114,21 @@ document.addEventListener('mousemove', (event) => {
         layout.style.gridTemplateRows = `${Math.max(min_height, Math.min(y, window.innerHeight - min_height))}px 5px 1fr`;
     }
 })
-
 document.addEventListener('keydown', (event) => {
     let key = event.key;
     if (key.length === 1) {
         command += key;
+        if(focused === Panel.TERMINAL && key === "/"){
+            event.preventDefault();
+        }
     } else if (key === "Backspace"){
         command = command.slice(0, -1);
+    } else {
+        return;
     }
-    document.getElementById("command").textContent = current_dir + "> " + command;
+    commandElement.replaceChildren();
+    let tokens = tokenise(command);
+    for(const token of tokens){
+        commandElement.appendChild(renderToken(token));
+    }
 })
