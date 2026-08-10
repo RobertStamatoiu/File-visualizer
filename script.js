@@ -8,6 +8,9 @@ const RowSeparator = document.getElementById("horizontal-separator");
 const ColSeparator = document.getElementById("vertical-separator");
 const terminal = document.getElementById("terminal");
 const commandElement = document.getElementById("command");
+const treeTopBar = document.getElementById("tree-top-bar");
+const addFileIcon = document.getElementById("add-file-button");
+const TypeFile = document.querySelector('.file');
 
 // the panel type (later used for focusing / colapsing)
 
@@ -110,7 +113,11 @@ document.addEventListener('mousemove', (event) => {
     }
     if (col_dragging) {
         const x = event.clientX;
-        layout.style.gridTemplateColumns = `${Math.max(min_width, Math.min(x, window.innerWidth - min_width))}px 5px 1fr`;
+        const width = Math.max(min_width, Math.min(x, window.innerWidth - min_width));
+        layout.style.gridTemplateColumns = `${width}px 5px 1fr`;
+        treeTopBar.style.width = `${width - 2}px`;
+        TypeFile.style.width = `${width - 12}px`;
+
     } else {
         const y = event.clientY;
         layout.style.gridTemplateRows = `${Math.max(min_height, Math.min(y, window.innerHeight - min_height))}px 5px 1fr`;

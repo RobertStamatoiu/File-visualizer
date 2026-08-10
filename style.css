@@ -30,7 +30,7 @@ body {
 .block {
     border: 2px solid black;
     user-select: none;
-    background-color: #021a33;
+    background-color: #1e1e1e;
 }
 
 #terminal {
@@ -49,6 +49,82 @@ body {
     overflow-y: auto;
 }
 
+#tree-top-bar {
+    position: relative;
+
+
+    width: 698px;
+    height: 35px;
+
+    background-color: #0f0f0f;
+}
+
+#add-file-button {
+    position: absolute;
+    
+    width: 20px;
+    height: 30px;
+
+    right: 13px;
+    top: 3px;
+
+    background-image: url("images/add-file-icon.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 1;
+}
+
+#add-folder-button {
+    position: absolute;
+    
+    width: 35px;
+    height: 25px;
+
+    right: 40px;
+    top: 5px;
+
+    background-image: url("images/add-folder-icon.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 1;
+}
+
+#name {
+    position: absolute;
+
+    width: 100px;
+    height: 30px;
+
+    left: 10px;
+    top: 0px;
+    bottom: 3px;
+
+    text-align: center;
+    color: white;
+    font-weight: bolder;
+    font-size: xx-large;
+}
+
+#add-file-button:hover,
+#add-folder-button:hover,
+.file:hover {
+    border: 1px dashed white;
+}
+
+.file {
+    position: absolute;
+
+    top:40px;
+    left:10px;
+    
+    width: 688px;
+    height: 30px;
+}
+
+
+
 .terminal-overlay {
     position: absolute;
     inset: 0;
@@ -64,7 +140,22 @@ body {
     z-index: 0;
 }
 
-#tree {
+.node {
+    position: absolute;
+
+    margin-top: 50px;
+    margin-left: 70px;
+
+    border: none;
+
+    width: 150px;
+    height: 20px;
+
+    background-color: #2b2b2b;
+    color: #ffffff;
+}
+
+#tree-container {
     grid-column: 1;
     grid-row: 1 / 4;
 }
@@ -115,9 +206,27 @@ body {
 
 /* here we add colors for the text to be used later */
 
-.command     { color: #FF1744; font-weight: bold; }
-.fluorescent { color: #CCFF00; }
-.info        { color: #5FDDEF; }
-.success     { color: #0DDF0A; }
-.flag        { color: #717171; }
-.filepath    { color: #a3edea; }
+.command {
+    color: #FF1744;
+    font-weight: bold;
+}
+
+.fluorescent {
+    color: #CCFF00;
+}
+
+.info {
+    color: #5FDDEF;
+}
+
+.success {
+    color: #0DDF0A;
+}
+
+.flag {
+    color: #717171;
+}
+
+.filepath {
+    color: #a3edea;
+}
