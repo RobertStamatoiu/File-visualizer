@@ -10,7 +10,9 @@ const terminal = document.getElementById("terminal");
 const commandElement = document.getElementById("command");
 const treeTopBar = document.getElementById("tree-top-bar");
 const addFileIcon = document.getElementById("add-file-button");
-const TypeFile = document.querySelector('.file');
+const addFolderIcon = document.getElementById("add-folder-button");
+const folders = document.querySelectorAll(".folder");
+const files = document.querySelectorAll(".file");
 
 // the panel type (later used for focusing / colapsing)
 
@@ -102,7 +104,15 @@ function renderToken(token) {
     span.textContent += " ";
     return span;
 }
-
+function indent(folder) {
+    let indent = 0;
+    let parent = folder.parentElement;
+    while (parent && parent.classList.contains("folder")) {
+        indent += 20;
+        parent = parent.parentElement;
+    }
+    return indent;
+}
 RowSeparator.addEventListener('mousedown', () => { row_dragging = true; });
 ColSeparator.addEventListener('mousedown', () => { col_dragging = true; });
 document.addEventListener('mouseup', () => { row_dragging = false; col_dragging = false; });
@@ -115,9 +125,15 @@ document.addEventListener('mousemove', (event) => {
         const x = event.clientX;
         const width = Math.max(min_width, Math.min(x, window.innerWidth - min_width));
         layout.style.gridTemplateColumns = `${width}px 5px 1fr`;
-        treeTopBar.style.width = `${width - 2}px`;
-        TypeFile.style.width = `${width - 12}px`;
-
+        folders.forEach((folder) => {
+            folder.querySelector('.folder-header').style.width = `${width - indent(folder)}px`;
+            folder.querySelector('.folder-body').style.width = `${width - indent(folder)}px`;
+        });
+        files.forEach((file) => {
+            file.style.width = `${width - indent(file)}px`;
+            file.querySelector('.file-header').style.width = `${width - indent(file)}px`;
+        });
+        treeTopBar.style.width = `${width}px`;
     } else {
         const y = event.clientY;
         layout.style.gridTemplateRows = `${Math.max(min_height, Math.min(y, window.innerHeight - min_height))}px 5px 1fr`;
@@ -142,3 +158,9 @@ document.addEventListener('keydown', (event) => {
     }
 })
 
+folders.forEach((folder) => {
+    folder.querySelector(':scope > .folder-header').addEventListener('click', (event) => {
+        event.stopPropagation();
+        folder.classList.toggle("open");
+    });
+});

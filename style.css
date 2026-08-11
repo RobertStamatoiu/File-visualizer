@@ -108,19 +108,101 @@ body {
 }
 
 #add-file-button:hover,
-#add-folder-button:hover,
-.file:hover {
+#add-folder-button:hover {
     border: 1px dashed white;
 }
 
-.file {
+.folder {
+    position: relative;
+
+    color: white;
+    background-color: #262626;
+
+    width: 200px;
+    height: 20px;
+
+    font-size: medium;
+}
+
+.folder > .folder-body {
+    display: none;
+}
+
+.folder-header {
+    position: relative;
+
+    color: white;
+    background-color: #1E1E1E;
+
+    width: 200px;
+    height: 20px;
+
+    border: none;
+}
+
+.folder-header:hover,
+.file-header:hover {
+    border: 1px dashed white;
+
+    background-color: #042525;
+}
+
+.folder-arrow {
     position: absolute;
 
-    top:40px;
-    left:10px;
-    
-    width: 688px;
-    height: 30px;
+    bottom: 2px;
+
+    transition: transform 0.2s ease;
+}
+
+.folder.open > .folder-header .folder-arrow {
+    transform: rotate(90deg) translateX(2px) translateY(-2px);
+}
+
+.folder.open > .folder-body {
+    display: block;
+}
+
+.folder.open {
+    height: auto;
+}
+
+.folder-name {
+    position: absolute;
+
+    left: 17px;
+}
+
+.folder-body {
+    position: relative;
+
+    margin-left: 17px;
+}
+
+.file {
+    position: relative;
+
+    color: white;
+    background-color: #262626;
+
+    width: 200px;
+    height: 20px;
+
+    margin-top: 1px;
+
+    font-size: medium;
+}
+
+.file-header {
+    position: relative;
+
+    color: white;
+    background-color: #262626;
+
+    width: 200px;
+    height: 20px;
+
+    border: none;
 }
 
 
@@ -158,6 +240,7 @@ body {
 #tree-container {
     grid-column: 1;
     grid-row: 1 / 4;
+    overflow: auto;
 }
 
 #terminal-input {
@@ -184,7 +267,7 @@ body {
     }
 }
 
-#file {
+#editor {
     grid-column: 3;
     grid-row: 1;
 }
