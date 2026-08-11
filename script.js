@@ -11,9 +11,6 @@ const commandElement = document.getElementById("command");
 const treeTopBar = document.getElementById("tree-top-bar");
 const addFileIcon = document.getElementById("add-file-button");
 const addFolderIcon = document.getElementById("add-folder-button");
-const folders = document.querySelectorAll(".folder");
-const files = document.querySelectorAll(".file");
-
 // the panel type (later used for focusing / colapsing)
 
 const Panel = Object.freeze({
@@ -113,6 +110,27 @@ function indent(folder) {
     }
     return indent;
 }
+
+const work = new fs.Directory(fs.root, "Work");
+const t1 = new fs.TextFile(work, "file1", "Hello, World!");
+const t2 = new fs.TextFile(work, "file2", "This is a test file.");
+const f1 = new fs.Directory(work, "Folder_1");
+const t3 = new fs.TextFile(f1, "file3", "Another test file.");
+const t4 = new fs.TextFile(f1, "file4", "Yet another test file.");
+
+const result = fs.resolveTree();
+document.getElementById("tree-container").appendChild(result);
+
+const folders = document.querySelectorAll(".folder");
+const files = document.querySelectorAll(".file");
+
+folders.forEach((folder) => {
+    folder.querySelector(':scope > .folder-header').addEventListener('click', (event) => {
+        event.stopPropagation();
+        folder.classList.toggle("open");
+    });
+});
+
 RowSeparator.addEventListener('mousedown', () => { row_dragging = true; });
 ColSeparator.addEventListener('mousedown', () => { col_dragging = true; });
 document.addEventListener('mouseup', () => { row_dragging = false; col_dragging = false; });
@@ -158,9 +176,3 @@ document.addEventListener('keydown', (event) => {
     }
 })
 
-folders.forEach((folder) => {
-    folder.querySelector(':scope > .folder-header').addEventListener('click', (event) => {
-        event.stopPropagation();
-        folder.classList.toggle("open");
-    });
-});

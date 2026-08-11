@@ -7,7 +7,7 @@ function shareCharacters(a, b) {
     return [...b].some(char => chars.has(char));
 }
 
-function success(code, message){
+function success(code, message) {
     return {
         success: true,
         returnCode: code,
@@ -15,7 +15,7 @@ function success(code, message){
     };
 }
 
-function fail(code, message){
+function fail(code, message) {
     return {
         success: false,
         returnCode: code,
@@ -30,62 +30,62 @@ class File {
         if (new.target === File) {
             throw new Error("I told you File is an abstract class!");
         }
-        if(shareCharacters(name, bannedCharacters)){
+        if (shareCharacters(name, bannedCharacters)) {
             throw new Error(`Cannot create \"${name}\" because it contains invalid characters`);
         }
         this.parent = parent;
         this.name = name;
-        if(parent != null){
+        if (parent != null) {
             parent.children.push(this);
         }
     }
-    descendantOf(file){
+    descendantOf(file) {
         let current = this.parent;
-        while(current !== null){
-            if(current === file){
+        while (current !== null) {
+            if (current === file) {
                 return true;
             }
             current = current.parent;
         }
         return false;
     }
-    move(newParent){
-        if(!(newParent instanceof Directory)){
+    move(newParent) {
+        if (!(newParent instanceof Directory)) {
             return fail(
                 "MOVE_TO_NON_DIRECTORY",
                 `Cannot move ${this.name} to ${newParent.name} because ${newParent.name} is not a directory`
             );
-        } else if (newParent === null || newParent === undefined){
+        } else if (newParent === null || newParent === undefined) {
             return fail(
                 "MOVE_TO_NULL",
                 `Cannot move \"${this.name}\" to a null directory`
             );
-        } else if (newParent === this){
+        } else if (newParent === this) {
             return fail(
                 "MOVE_TO_SELF",
                 `Cannot move ${this.name} to itself`
             );
-        } else if (newParent.parent === null && newParent !== root){
+        } else if (newParent.parent === null && newParent !== root) {
             return fail(
                 "MOVE_TO_DEL",
                 `Cannot move ${this.name} because destination has been deleted`
             );
-        } else if (newParent === this.parent){
+        } else if (newParent === this.parent) {
             return fail(
                 "MOVE_TO_PARENT",
                 `Cannot move ${this.name} to ${newParent.name} because ${this.name} is already inside ${newParent.name}`
             );
-        } else if (this.name === "root"){
+        } else if (this.name === "root") {
             return fail(
                 "MOVE_ROOT",
                 `Cannot move the root`
             );
-        } else if (newParent.descendantOf(this)){
+        } else if (newParent.descendantOf(this)) {
             return fail(
                 "MOVE_TO_CHILD",
                 `Cannot move ${this.name} to ${newParent.name} because ${newParent.name} is a descendant ot ${this.name}`
             );
-        } else if (this.name === "" && this.parent === null){
+        } else if (this.name === "" && this.parent === null) {
             return fail(
                 "MOVING_DELETED",
                 `Cannot move this file because it doesn't exist`
@@ -93,23 +93,23 @@ class File {
         }
         this.parent.children.splice(this.parent.children.indexOf(this), 1);
         return newParent.add(this);
-        
+
     }
-    rename(newName){
-        if(newName === "" || newName.replace(/\s/g, "") === ""){
+    rename(newName) {
+        if (newName === "" || newName.replace(/\s/g, "") === "") {
             return fail(
                 "EMPTY_NAME",
                 `Cannot rename \"${this.name}\" to an empty string`
             );
-        } else if(
-            newName.includes("/")  ||
+        } else if (
+            newName.includes("/") ||
             newName.includes("\\") ||
-            newName.includes(" ")  ||
+            newName.includes(" ") ||
             newName.includes("\t") ||
             newName.includes("\n") ||
             newName.includes("\"") ||
-            newName.includes(":")  ||
-            newName.includes(">")  ||
+            newName.includes(":") ||
+            newName.includes(">") ||
             newName.includes("<")
         ) {
             return fail(
@@ -124,11 +124,11 @@ class File {
             `Successfully renamed \"${oldName}\" to \"${newName}\"`
         )
     }
-    destroy(){
+    destroy() {
         let index;
-        if(this.parent != null){
+        if (this.parent != null) {
             index = this.parent.children.indexOf(this);
-        } else if (this.name === "root"){
+        } else if (this.name === "root") {
             return fail(
                 "DEL_ROOT",
                 `Cannot delete the root directory`
@@ -139,7 +139,7 @@ class File {
                 `Cannot delete this file because it doesn't exist`
             );
         }
-        if(index != -1){
+        if (index != -1) {
             this.parent.children.splice(index, 1);
         } else {
             return fail(
@@ -154,30 +154,30 @@ class File {
             "SUCCESSFUL_DEL",
             `Successfully deleted \"${oldName}\"`
         );
-        
+
     }
 }
 
 
 export class Directory extends File {
-    constructor(parent = null, name){
+    constructor(parent = null, name) {
         super(parent, name);
         this.children = [];
     }
-    add(file){
-        if(file instanceof File){
+    add(file) {
+        if (file instanceof File) {
             let index = this.children.indexOf(file);
-            if(index != -1) {
+            if (index != -1) {
                 return fail(
                     "ADD_TO_PARENT",
                     `\"${file.name}\" is already a part of \"${this.name}\"`
                 );
-            } else if (file.parent === null && file !== root){
+            } else if (file.parent === null && file !== root) {
                 return fail(
                     "ADD_DELETED",
                     `Cannot add this file to \"${this.name}\" because this file has been deleted`
                 );
-            } else if (this.descendantOf(file)){
+            } else if (this.descendantOf(file)) {
                 return fail(
                     "ADD_TO_DESCENDANT",
                     `Cannot add \"${file.name}\" to \"${this.name}\" because \"${this.name}\" is a descendant of \"${file.name}\"`
@@ -198,7 +198,7 @@ export class Directory extends File {
 
         } else if (Array.isArray(file)) {
             let successState = [];
-            for(const f of file){
+            for (const f of file) {
                 successState.push(this.add(f));
             }
             return successState;
@@ -209,10 +209,10 @@ export class Directory extends File {
             )
         }
     }
-    remove(file){
-        if (file instanceof File){
+    remove(file) {
+        if (file instanceof File) {
             let index = this.children.indexOf(file);
-            if (index === -1){
+            if (index === -1) {
                 return fail(
                     "DEL_NO_EXIST",
                     `\"${file.name}\" does not exist inside folder \"${this.name}\"`
@@ -220,9 +220,9 @@ export class Directory extends File {
             } else {
                 return file.destroy();
             }
-        } else if (Array.isArray(file)){
+        } else if (Array.isArray(file)) {
             let successState = []
-            for (const f of file){
+            for (const f of file) {
                 successState.push(this.remove(f));
             }
             return successState;
@@ -233,27 +233,27 @@ export class Directory extends File {
             );
         }
     }
-    forceDestroy(){
-        if(this.parent === null && this.name === "root"){
+    forceDestroy() {
+        if (this.parent === null && this.name === "root") {
             return fail(
                 "ROOT_DEL",
                 `Cannot force destroy the root directory`
             );
         }
         let copy = [...this.children]
-        for(const file of copy){
+        for (const file of copy) {
             file.destroy();
         }
         let oldName = this.name;
         return super.destroy();
     }
-    destroy(){
-        if (this.parent === null && this.name === "root"){
+    destroy() {
+        if (this.parent === null && this.name === "root") {
             return fail(
                 "ROOT_DEL",
                 `Cannot destroy the root directory`
             );
-        }else if (this.parent === null){
+        } else if (this.parent === null) {
             return fail(
                 "DOUBLE_DEL",
                 `Cannot delete this directory because it doesn't exist`
@@ -269,14 +269,14 @@ export class Directory extends File {
 export const root = new Directory(null, "root");
 
 export class TextFile extends File {
-    constructor(parent, name, content = ""){
-        if(parent == null || !(parent instanceof Directory)){
+    constructor(parent, name, content = "") {
+        if (parent == null || !(parent instanceof Directory)) {
             throw new Error("Cannot create a file without a parent directory");
         }
         super(parent, name + ".txt");
         this.content = content;
     }
-    edit(newContent){
+    edit(newContent) {
         this.content = newContent;
         return success(
             "SUCCESSFUL_EDIT",
@@ -285,3 +285,81 @@ export class TextFile extends File {
     }
 }
 
+export function resolvePath(file /* fs.File */) {
+    if (file instanceof Directory) {
+        if (file === root) {
+            return "//";
+        } else {
+            let current_path = file.name + "/";
+            let dir = file.parent;
+            while (dir !== root) {
+                current_path = dir.name + "/" + current_path;
+                dir = dir.parent;
+            }
+            current_path = "//" + current_path;
+            return current_path;
+        }
+    } else if (file instanceof TextFile) {
+        let current_path = file.name;
+        let dir = file.parent;
+        while (dir !== root) {
+            current_path = dir.name + "/" + current_path;
+            dir = dir.parent;
+        }
+        current_path = "//" + current_path;
+        return current_path;
+    } else if (Array.isArray(file)) {
+        let paths = [];
+        for (const f of file) {
+            paths.push(resolvePath(f));
+        }
+        return paths;
+    } else {
+        throw new Error(`Cannot resolve the path of ${file} because it is not a file`);
+    }
+}
+
+export function resolveTree(file = root /*instance of a Directory*/) {
+    if (file instanceof Directory) {
+        const folder = document.createElement("div");
+        folder.className = "folder";
+        folder.dataset.path = resolvePath(file);
+
+        const folderHeader = document.createElement("div");
+        folderHeader.className = "folder-header";
+
+        const folderName = document.createElement("div");
+        folderName.className = "folder-name";
+        folderName.textContent = file.name;
+
+        const folderArrow = document.createElement("div");
+        folderArrow.className = "folder-arrow";
+        folderArrow.textContent = "▶";
+
+        folderHeader.appendChild(folderName);
+        folderHeader.appendChild(folderArrow);
+
+        folder.appendChild(folderHeader);
+
+        const folderBody = document.createElement("div");
+        folderBody.className = "folder-body";
+        for (const kid of file.children) {
+            folderBody.appendChild(resolveTree(kid));
+        }
+
+        folder.appendChild(folderBody);
+
+        return folder;
+
+    } else if (file instanceof TextFile) {
+        const filee = document.createElement("div");
+        filee.className = "file";
+        filee.dataset.path = resolvePath(file);
+
+        const fileHeader = document.createElement("div");
+        fileHeader.className = "file-header";
+        fileHeader.textContent = file.name;
+        filee.appendChild(fileHeader);
+        return filee;
+    }
+}
