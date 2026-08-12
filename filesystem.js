@@ -156,13 +156,16 @@ class File {
         );
 
     }
+    copy() {
+        return new File(this.parent, this.name);
+    }
 }
 
 
 export class Directory extends File {
-    constructor(parent = null, name) {
+    constructor(parent = null, name, kids = []) {
         super(parent, name);
-        this.children = [];
+        this.children = kids;
     }
     add(file) {
         if (file instanceof File) {
@@ -263,6 +266,9 @@ export class Directory extends File {
             return super.destroy();
         }
     }
+    copy() {
+        return new Directory(this.parent, this.name, this.children.map(child => child.copy()));
+    }
 
 }
 
@@ -282,6 +288,9 @@ export class TextFile extends File {
             "SUCCESSFUL_EDIT",
             `Successfully edited \"${this.name}\"`
         );
+    }
+    copy() {
+        return new TextFile(this.parent, this.name.slice(0, -4), this.content);
     }
 }
 
@@ -314,6 +323,18 @@ export function resolvePath(file /* fs.File */) {
             paths.push(resolvePath(f));
         }
         return paths;
+    } else if (typeof file === "string") {
+        const names = file.split("/").filter(Boolean);
+        let folder = root;
+
+        for (const name of names) {
+            const next_dir = folder.children.find(child => child instanceof Directory && child.name === name);
+            if (!next_dir) {
+                throw new Error(`Path not found: ${file}`);
+            }
+            folder = next_dir;
+        }
+        return folder;
     } else {
         throw new Error(`Cannot resolve the path of ${file} because it is not a file`);
     }

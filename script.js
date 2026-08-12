@@ -8,9 +8,10 @@ const RowSeparator = document.getElementById("horizontal-separator");
 const ColSeparator = document.getElementById("vertical-separator");
 const terminal = document.getElementById("terminal");
 const commandElement = document.getElementById("command");
+const treeContainer = document.getElementById("tree-container");
 const treeTopBar = document.getElementById("tree-top-bar");
-const addFileIcon = document.getElementById("add-file-button");
-const addFolderIcon = document.getElementById("add-folder-button");
+const addFileBtn = document.getElementById("add-file-button");
+const addFolderBtn = document.getElementById("add-folder-button");
 // the panel type (later used for focusing / colapsing)
 
 const Panel = Object.freeze({
@@ -27,6 +28,12 @@ const tokenType = Object.freeze({
     flag: 5
 });
 
+const addFile = Object.freeze({
+    False: 0,
+    File: 1,
+    Folder: 2
+});
+
 // various variables used thourghout
 
 let row_dragging = false;
@@ -36,6 +43,9 @@ let min_width = 230;
 let focused = Panel.TERMINAL;
 let command = "";
 let current_dir = "";
+let folder_focused = null;
+let add_file_mode = addFile.False;
+let currentInput = null;
 
 function tokenise(input) {
     let tokens = [];
@@ -111,25 +121,102 @@ function indent(folder) {
     return indent;
 }
 
-const work = new fs.Directory(fs.root, "Work");
-const t1 = new fs.TextFile(work, "file1", "Hello, World!");
-const t2 = new fs.TextFile(work, "file2", "This is a test file.");
-const f1 = new fs.Directory(work, "Folder_1");
-const t3 = new fs.TextFile(f1, "file3", "Another test file.");
-const t4 = new fs.TextFile(f1, "file4", "Yet another test file.");
+function renderTree() {
+    const openPaths = new Set(
+        [...treeContainer.querySelectorAll(".folder.open")].map(folder => folder.dataset.path)
+    );
+    const focusedPath = folder_focused?.dataset.path ?? fs.resolvePath(fs.root);
 
-const result = fs.resolveTree();
-document.getElementById("tree-container").appendChild(result);
+    treeContainer.replaceChildren(treeTopBar, fs.resolveTree());
 
-const folders = document.querySelectorAll(".folder");
-const files = document.querySelectorAll(".file");
+    treeContainer.querySelectorAll(".folder").forEach((folder) => {
+        if (openPaths.has(folder.dataset.path) || folder.dataset.path === focusedPath) {
+            folder.classList.add("open");
+        }
 
-folders.forEach((folder) => {
-    folder.querySelector(':scope > .folder-header').addEventListener('click', (event) => {
-        event.stopPropagation();
-        folder.classList.toggle("open");
+        folder.querySelector(':scope > .folder-header').addEventListener('click', (event) => {
+            event.stopPropagation();
+            folder.classList.toggle("open");
+            folder_focused = folder;
+        });
     });
-});
+
+    folder_focused = [...treeContainer.querySelectorAll(".folder")].find(
+        folder => folder.dataset.path === focusedPath
+    ) ?? treeContainer.querySelector(".folder");
+}
+
+function cancelAddItem() {
+    currentInput?.closest(".add-item")?.remove();
+    currentInput = null;
+    add_file_mode = addFile.False;
+}
+
+function startAddItem(mode) {
+    if (!folder_focused || currentInput) {
+        return;
+    }
+
+    const folderBody = folder_focused.querySelector(':scope > .folder-body');
+    folder_focused.classList.add("open");
+
+    const inputHolder = document.createElement("div");
+    inputHolder.className = "add-item";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = mode === addFile.File ? "Enter file name" : "Enter folder name";
+    input.className = "add-item-input";
+
+    inputHolder.appendChild(input);
+    folderBody.prepend(inputHolder);
+    input.focus();
+
+    add_file_mode = mode;
+    currentInput = input;
+
+    input.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            event.preventDefault();
+            cancelAddItem();
+            return;
+        }
+
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        event.preventDefault();
+        const name = input.value.trim();
+        if (!name) {
+            cancelAddItem();
+            return;
+        }
+
+        try {
+            const parent = fs.resolvePath(folder_focused.dataset.path);
+            if (mode === addFile.File) {
+                new fs.TextFile(parent, name);
+            } else {
+                new fs.Directory(parent, name);
+            }
+        } catch (error) {
+            input.select();
+            return;
+        }
+
+        cancelAddItem();
+        renderTree();
+    });
+
+    input.addEventListener("blur", () => {
+        if (currentInput === input) {
+            cancelAddItem();
+        }
+    });
+}
+
+renderTree();
 
 RowSeparator.addEventListener('mousedown', () => { row_dragging = true; });
 ColSeparator.addEventListener('mousedown', () => { col_dragging = true; });
@@ -143,11 +230,11 @@ document.addEventListener('mousemove', (event) => {
         const x = event.clientX;
         const width = Math.max(min_width, Math.min(x, window.innerWidth - min_width));
         layout.style.gridTemplateColumns = `${width}px 5px 1fr`;
-        folders.forEach((folder) => {
+        treeContainer.querySelectorAll(".folder").forEach((folder) => {
             folder.querySelector('.folder-header').style.width = `${width - indent(folder)}px`;
             folder.querySelector('.folder-body').style.width = `${width - indent(folder)}px`;
         });
-        files.forEach((file) => {
+        treeContainer.querySelectorAll(".file").forEach((file) => {
             file.style.width = `${width - indent(file)}px`;
             file.querySelector('.file-header').style.width = `${width - indent(file)}px`;
         });
@@ -158,6 +245,10 @@ document.addEventListener('mousemove', (event) => {
     }
 })
 document.addEventListener('keydown', (event) => {
+    if (event.target instanceof HTMLInputElement) {
+        return;
+    }
+
     let key = event.key;
     if (key.length === 1) {
         command += key;
@@ -176,3 +267,10 @@ document.addEventListener('keydown', (event) => {
     }
 })
 
+addFileBtn.addEventListener('click', () => {
+    startAddItem(addFile.File);
+});
+
+addFolderBtn.addEventListener('click', () => {
+    startAddItem(addFile.Folder);
+});
