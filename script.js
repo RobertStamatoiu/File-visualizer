@@ -12,6 +12,7 @@ const treeContainer = document.getElementById("tree-container");
 const treeTopBar = document.getElementById("tree-top-bar");
 const addFileBtn = document.getElementById("add-file-button");
 const addFolderBtn = document.getElementById("add-folder-button");
+const treeCloseBtn = document.getElementById("tree-close-button");
 // the panel type (later used for focusing / colapsing)
 
 const Panel = Object.freeze({
@@ -274,3 +275,7 @@ addFileBtn.addEventListener('click', () => {
 addFolderBtn.addEventListener('click', () => {
     startAddItem(addFile.Folder);
 });
+
+treeCloseBtn.addEventListener('click', () => {
+    layout.style.gridTemplateColumns = `0px 5px 1fr`;
+})

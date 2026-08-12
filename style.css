@@ -65,7 +65,7 @@ body {
     width: 20px;
     height: 30px;
 
-    right: 13px;
+    right: 75px;
     top: 3px;
 
     background-image: url("images/add-file-icon.png");
@@ -81,7 +81,7 @@ body {
     width: 35px;
     height: 25px;
 
-    right: 40px;
+    right: 102px;
     top: 5px;
 
     background-image: url("images/add-folder-icon.png");
@@ -89,22 +89,6 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     opacity: 1;
-}
-
-#name {
-    position: absolute;
-
-    width: 100px;
-    height: 30px;
-
-    left: 10px;
-    top: 0px;
-    bottom: 3px;
-
-    text-align: center;
-    color: white;
-    font-weight: bolder;
-    font-size: xx-large;
 }
 
 #add-file-button:hover,
@@ -247,6 +231,40 @@ body {
     border: 1px dashed white;
 
     background-color: #042525;
+}
+
+.close-button {
+    width: 60px;
+    height: 40px;
+
+    background-color: #0e0e0e;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    right: 2px;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s ease-in-out;
+}
+
+.close-button-image {
+    width: 30px;
+    height: 30px;
+
+    background-image: url('./images/close-icon.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background-color: #da0f0f;
 }
 
 
